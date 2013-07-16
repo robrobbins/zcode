@@ -117,6 +117,8 @@ window.zcode = {
           } else shtml += this.expandTag(this.getInfo(sub));
         }
         html = shtml;
+        // clear the 'sub-html' in case of another sibling array
+        shtml = '';
       } else {
         // just a tag, get an info object and 
         // assemble this piece of the html string, wrap it when appropriate

@@ -99,4 +99,8 @@ describe('zcode', function() {
   it('can handle the El+El>El form', function() {
     expect(zen('div+div>a')).toBe('<div></div><div><a></a></div>');
   });
+
+  it('can handle the El+El>El+El form', function() {
+    expect(zen('div+div>p+p')).toBe('<div></div><div><p></p><p></p></div>');
+  });
 });
