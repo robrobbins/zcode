@@ -105,14 +105,18 @@ window.zcode = {
   // an html string
   makeHtml: function makeHtml(arr) {
     // iterate the collection backwards by popping items off
-    var curr, html = '', info, sub;
+    var curr, html = '', shtml = '', info, sub;
     for(curr; arr.length && (curr = arr.pop());) {
       // is this an array of siblings?
       if (Array.isArray(curr)) {
         // they dont wrap
         for(sub; curr.length && (sub = curr.shift());) {
-          html += this.expandTag(this.getInfo(sub));
+          // if we are at the last element, and there is html -- nest it
+          if(!curr.length && html) {
+            shtml += this.expandTag(this.getInfo(sub), html);
+          } else shtml += this.expandTag(this.getInfo(sub));
         }
+        html = shtml;
       } else {
         // just a tag, get an info object and 
         // assemble this piece of the html string, wrap it when appropriate

@@ -95,4 +95,8 @@ describe('zcode', function() {
   it('can parse data- via attributes', function() {
     expect(zen('div[data-foo="bar"]')).toBe('<div data-foo="bar"></div>');
   });
+
+  it('can handle the El+El>El form', function() {
+    expect(zen('div+div>a')).toBe('<div></div><div><a></a></div>');
+  });
 });
