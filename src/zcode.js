@@ -41,12 +41,12 @@ window.zcode = {
   expandTag: function expandTag(info, html) {
     var opening = this.sub(this.tdef[0], info), closing = this.tags[info.tag], 
       closingTag = closing === 1 ? this.sub(this.tdef[1], info) : this.tdef[closing],
-      props = '';
+      afterOpen = closing < 2 ? '>' : '', props = '';
     if('id' in info) props += this.sub(this.props.id, info); 
     if('classes' in info) props += this.sub(this.props.classes, {classes: info.classes.join(' ')});
     if('attrs' in info) props += info.attrs;
-    if(!props) opening = opening.trim() + '>';
-    else opening += (props.trim() + '>');
+    if(!props) opening = opening.trim() + afterOpen;
+    else opening += (props.trim() + afterOpen);
     return opening + (html || info.content || '') + closingTag;
   },
   getHtml: function getHtml(str) {
@@ -64,15 +64,18 @@ window.zcode = {
   getInfo: function getInfo(str) {
     var reTag = /^[a-z1-9]+/, reId = /#([a-z_-]+)/, 
       reCl = /\.[a-z_-]+/g, reAttr = /\[\s*(.+)\s*\]/,
-      reCon = /{\s*(.+)\s*}/, info = {}, match, curr;
+      reCon = /\{\s*(.+)\s*\}/, reHtmlCon = /\{\{\s*(.+)\s*\}\}/,
+      // if an innerHtml content block is present, dont try to match inside it
+      sub = str.indexOf('{{') === -1 ? undefined : str.slice(0, str.indexOf('{{')),
+      info = {}, match, curr;
     // get the tag
-    info.tag = str.match(reTag)[0];
+    info.tag = (sub || str).match(reTag)[0];
     // an id?
-    if((match = str.match(reId))) {
+    if((match = (sub || str).match(reId))) {
       info.id = match[1];
     }
     // classes?
-    if((match = str.match(reCl))) {
+    if((match = (sub || str).match(reCl))) {
       info.classes = [];
       // there may be multiple matches
       for(curr; match.length && (curr = match.shift());) {
@@ -81,12 +84,16 @@ window.zcode = {
       }
     }
     // attrs can be simply pulled out of the brackets
-    if((match = str.match(reAttr))) {
+    if((match = (sub || str).match(reAttr))) {
       info.attrs = match[1];
     }
     // content as well
     if((match = str.match(reCon))) {
       info.content = match[1];
+    }
+    // if the content is HTML, zenception!
+    if((match = str.match(reHtmlCon))) {
+      info.content = this.getHtml(match[1]);
     }
     return info;
   },
@@ -143,7 +150,7 @@ window.zcode = {
   tags: {
     'a':1,'article':1,'aside':1,'b':1,'blockquote':1,'body':1,'br':2,
     'button':1,'canvas':1,'code':1,'datalist':1,'dd':1,'div':1,'dl':1,'dt':1,
-    'em':1,'embed':3,'figcaption':1,'figure':1,'footer':1,'form':1,'h1':1,
+    'em':1,'embed':3,'fieldset': 1,'figcaption':1,'figure':1,'footer':1,'form':1,'h1':1,
     'h2':1,'h3':1,'h4':1,'h5':1,'h6':1,'head':1,'header':1,'hgroup':1,'hr':2,
     'html':1,'i':1,'iframe':1,'img':1,'input':2,'kbd':1,'label':1,'legend':1,
     'li':1,'link':3,'mark':1,'menu':1,'meta':1,'nav':1,'noscript':1,'object':1,

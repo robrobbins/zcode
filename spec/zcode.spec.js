@@ -103,4 +103,17 @@ describe('zcode', function() {
   it('can handle the El+El>El+El form', function() {
     expect(zen('div+div>p+p')).toBe('<div></div><div><p></p><p></p></div>');
   });
+
+  it('properly expands a self closing form', function() {
+    expect(zen('input#what[type="text"]')).toBe('<input id="what" type="text"/>');
+  });
+
+  it('properly expands a non closing form', function() {
+    expect(zen('link[media="screen"]')).toBe('<link media="screen">');
+  });
+
+  it('can handle innerHTML content', function() {
+      expect(zen('div{{input#what}}+div>input#where')).toBe('<div><input id="what"/></div><div><input id="where"/></div>');
+  });
+
 });
